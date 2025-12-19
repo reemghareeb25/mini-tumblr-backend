@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/comments", commentRoutes);
+app.use("/api/co", postRoutes);
 
 app.get("/", (req, res) => {
     res.send("API is running...., Hello There!")

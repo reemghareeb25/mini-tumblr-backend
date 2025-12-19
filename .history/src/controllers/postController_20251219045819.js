@@ -1,0 +1,53 @@
+import Post from "../models/postModel.js";
+
+export const createPost = async (req, res) => {
+    try {
+        const {content} = req.body;
+
+        if(!content){
+            return res.status(400).json({message: "Post content is required "});
+        }
+
+        const post = await Post.create({
+            content,
+            user: req.user_id
+        });
+        res.status(201).json(post);
+    }
+    catch(error){
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getAllPosts = async (req, res) => {
+    try{
+        const posts = await Post.find().
+        populate("user", "name avatar").
+        sort({createdAt: -1});
+
+        res.json(posts);
+    }
+    catch(error){
+        res.status(500).json({message: error.message})
+    }
+};
+
+export const getUserPosts = async (req, res) => {
+    try{
+        const posts = await Post.find({user: req.params.id}).
+        populate("user", "name avatar").
+        sort({createdAt: -1});
+
+        res.json(posts);
+    }
+    catch(error){
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const updatePost  = async(req, res) => {
+    try{
+
+    }
+    catch
+};

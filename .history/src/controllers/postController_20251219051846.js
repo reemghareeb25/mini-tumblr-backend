@@ -1,0 +1,120 @@
+import Post from "../models/postModel.js";
+
+export const createPost = async (req, res) => {
+    try {
+        const {content} = req.body;
+
+        if(!content){
+            return res.status(400).json({message: "Post content is required "});
+        }
+
+        const post = await Post.create({
+            content,
+            user: req.user_id
+        });
+        res.status(201).json(post);
+    }
+    catch(error){
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getAllPosts = async (req, res) => {
+    try{
+        const posts = await Post.find().
+        populate("user", "name avatar").
+        sort({createdAt: -1});
+
+        res.json(posts);
+    }
+    catch(error){
+        res.status(500).json({message: error.message})
+    }
+};
+
+export const getUserPosts = async (req, res) => {
+    try{
+        const posts = await Post.find({user: req.params.id}).
+        populate("user", "name avatar").
+        sort({createdAt: -1});
+
+        res.json(posts);
+    }
+    catch(error){
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const updatePost  = async(req, res) => {
+    try{
+        const post = await Post.findById(req.params.id);
+        if(!post){
+            return res.status(404).json({message: "Post not found"});
+        }
+        post.content = req.body.content || post.content;
+        await post.save();
+
+        res.json(post);
+    }
+    catch(error){
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const deletePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        if (!post)
+            return res.status(404).json({ message: "Post not found" });
+
+        await post.deleteOne();
+        res.json({ message: "Post deleted successfully" });
+    } 
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const likePost = async (req, res) => {
+    try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post)
+        return res.status(404).json({ message: "Post not found" });
+
+    if (post.likes.includes(req.user._id)) {
+        return res.status(400).json({ message: "Post already liked" });
+    }
+
+    post.likes.push(req.user._id);
+    await post.save();
+
+    res.json({ message: "Post liked" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * @desc Unlike post
+ * @route PUT /api/posts/:id/unlike
+ * @access Private
+ */
+export const unlikePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post)
+      return res.status(404).json({ message: "Post not found" });
+
+    post.likes = post.likes.filter(
+      (id) => id.toString() !== req.user._id.toString()
+    );
+
+    await post.save();
+    res.json({ message: "Post unliked" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
