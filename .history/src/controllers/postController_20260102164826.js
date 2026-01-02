@@ -11,12 +11,10 @@ export const createPost = async (req, res) => {
         const post = await Post.create({
             content,
             author: req.user._id
-        });
-        const populatedPost = await post.populate(
-            "author",
-            "name email avatar"
-        );
-        res.status(201).json(populatedPost);
+        }).populate("author", "name email avatar");
+
+    
+        res.status(201).json(post);
     }
     catch(error){
         console.log(req.user);
@@ -28,7 +26,7 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try{
         const posts = await Post.find().
-        populate("author", "name avatar").
+        populate("user", "name avatar").
         sort({createdAt: -1});
 
         res.json(posts);
@@ -60,7 +58,7 @@ export const updatePost  = async(req, res) => {
         post.content = req.body.content || post.content;
         await post.save();
 
-        res.json({message: "Post updated successfully", post});
+        res.json(post);
     }
     catch(error){
         res.status(500).json({message: error.message});
@@ -110,22 +108,6 @@ export const toggleLikePost = async (req, res) => {
         });
     } 
     catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const getPostLikes = async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.id)
-                .populate('likes', 'username email'); 
-
-        if (!post) return res.status(404).json({ message: "Post not found" });
-
-        res.json({
-            likesCount: post.likes.length, 
-            likes: post.likes             
-        });
-    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };

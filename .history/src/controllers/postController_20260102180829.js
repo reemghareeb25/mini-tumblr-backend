@@ -117,7 +117,7 @@ export const toggleLikePost = async (req, res) => {
 export const getPostLikes = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-                .populate('likes', 'username email'); 
+                               .populate('likes', 'username email'); 
 
         if (!post) return res.status(404).json({ message: "Post not found" });
 
