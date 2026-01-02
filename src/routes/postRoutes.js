@@ -8,6 +8,7 @@ import {
     deletePost,
     toggleLikePost,
     getPostLikes,
+    getPostComments,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -23,4 +24,6 @@ router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
 router.put("/:id/like", protect, toggleLikePost);
 router.get("/:id", protect, getPostLikes);
+router.get("/:postId/comments", protect, getPostComments);
+
 export default router;

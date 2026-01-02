@@ -1,4 +1,5 @@
 import Post from "../models/postModel.js";
+import Comment from "../models/commentModel.js"
 
 export const createPost = async (req, res) => {
     try {
@@ -129,3 +130,18 @@ export const getPostLikes = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getPostComments = async (req, res) => {
+    try {
+        const postId = req.params.postId;
+
+        const comments = await Comment.find({ post: postId })
+            .populate("user", "name avatar")
+            .sort({ createdAt: -1 });
+
+        res.json(comments);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+

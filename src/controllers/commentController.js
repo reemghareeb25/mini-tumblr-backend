@@ -21,9 +21,6 @@ export const addComment = async (req, res) => {
             post: postId,
         });
 
-        post.comments.push(comment._id);
-        await post.save();
-
         res.status(201).json({
             message: "Comment added successfully",
             comment,
@@ -45,10 +42,15 @@ export const deleteComment = async (req, res) => {
 
         const post = await Post.findById(comment.post);
 
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
         const isCommentOwner =
             comment.user.toString() === req.user._id.toString();
         const isPostOwner =
-            post.user.toString() === req.user._id.toString();
+            post.author.toString() === req.user._id.toString();
+
 
         if (!isCommentOwner && !isPostOwner) {
             return res.status(403).json({ message: "Not authorized" });
@@ -56,10 +58,10 @@ export const deleteComment = async (req, res) => {
 
         await Comment.findByIdAndDelete(commentId);
 
-        post.comments = post.comments.filter(
-            (id) => id.toString() !== commentId
-        );
-        await post.save();
+        // post.comments = post.comments.filter(
+        //     (id) => id.toString() !== commentId
+        // );
+        // await post.save();
 
         res.json({ message: "Comment deleted successfully" });
     } 
