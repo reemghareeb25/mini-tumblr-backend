@@ -39,7 +39,7 @@ router.post("/unfollow/:id", protect, unfollowUser);
 router.get("/followers/:id", protect, getFollowers);
 router.get("/following/:id", protect, getFollowing);
 
-router.get("/followers", protect, getFollowers);
-router.get("/following", protect, getFollowing);
+router.get("/followers/:id", protect, getFollowers);
+router.get("/following/:id", protect, getFollowing);
 
 export default router;
